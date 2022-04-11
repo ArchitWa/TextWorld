@@ -33,7 +33,8 @@ public class Graph {
 
     public static class Room {
         private String name;
-        private HashMap<String ,Room> neighbors;
+        private boolean hasPlayerLoc;
+        private HashMap<String, Room> neighbors;
         private HashMap<String, Item> items;
 
         private Room(String name) {
@@ -42,8 +43,23 @@ public class Graph {
             this.name = name;
         }
 
+
         public void addNeighbor(Room n) {
             neighbors.put(n.name, n);
+        }
+
+        public Room getRandomRoom() {
+            Object[] neighborNames = getNeighborsNames();
+            return getNeighbor((String) neighborNames[(int) (Math.random() * neighborNames.length + 1)]);
+        }
+
+
+        public void setHasPlayerLoc() {
+            hasPlayerLoc = !hasPlayerLoc;
+        }
+
+        public boolean getHasPlayerLoc() {
+            return hasPlayerLoc;
         }
 
         /**
@@ -69,6 +85,10 @@ public class Graph {
             return s.toString();
         }
 
+        private Object[] getNeighborsNames() {
+            return neighbors.keySet().toArray();
+        }
+
         /**
          * Return neighbor whose name is name. Returns null otherwise
          *
@@ -80,11 +100,11 @@ public class Graph {
         }
 
         public String displayItems() {
-           StringBuilder s = new StringBuilder("This room has: ");
+            StringBuilder s = new StringBuilder("This room has: ");
             for (String key : items.keySet()) {
-                s.append(key).append(" ");
+                s.append(key).append(", ");
             }
-            return items.size() == 0 ? "There are no items in this room" : s.toString();
+            return items.size() == 0 ? "There are no items in this room" : s.substring(0, s.length() - 2);
         }
 
         public void addItem(String name) {
@@ -116,9 +136,26 @@ public class Graph {
         public String getName() {
             return name;
         }
+
+        public Room getPlayerRoom() {
+            for (String key : neighbors.keySet()) {
+                if (neighbors.get(key).getHasPlayerLoc()) {
+                    return neighbors.get(key);
+                }
+            }
+            return null;
+        }
+
+        public boolean neighborsHasPlayer() {
+            for (String key : neighbors.keySet()) {
+                if (neighbors.get(key).getHasPlayerLoc()) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
 }
-
 
 

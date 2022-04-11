@@ -1,23 +1,18 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Graph g = new Graph();
-        g.addNode("hall");
-        g.getNode("hall").addItem("paper");
 
-        g.addNode("closet");
-        g.getNode("closet").addItem("shoe");
+        /* Creating the graph */
+        Graph g = createGraph();
 
-        g.addNode("dungeon");
-        g.getNode("dungeon").addItem("key");
-
-        g.addDirectedEdge("hall", "dungeon");
-        g.addUndirectedEdge("hall", "closet");
-
+        /* Creating the player and adding him to the graph */
         Player player = new Player("Bob", "An adventurous fellow");
-        player.currentRoom = g.getNode("hall");
+        player.setCurrentRoom(g.getNode("hall"));
         Graph.Room currentRoom;
+
+        ArrayList<GenericEntity> entityList = createEntities(g);
 
         String response = "";
         Scanner s = new Scanner(System.in);
@@ -27,6 +22,7 @@ public class Main {
         System.out.println("--------------------------");
         do {
             currentRoom = player.currentRoom;
+            currentRoom.setHasPlayerLoc();
             System.out.println("You are currently in the " + currentRoom.getName());
             System.out.print("What do you want to do? > ");
 
@@ -35,7 +31,11 @@ public class Main {
             System.out.println("--------------------------");
 
             if (arr[0].equals("go")) {
-                player.moveToRoom(arr[1]);
+                if (player.moveToRoom(arr[1])) {
+                    System.out.println("You moved to: " + arr[1]);
+                } else {
+                    System.out.println("You cannot go there!");
+                }
             } else if (arr[0].equals("look")) {
                 System.out.println(currentRoom.displayItems());
             } else if (arr[0].equals("rooms")) {
@@ -55,6 +55,33 @@ public class Main {
         } while (!response.equals("quit"));
 
 
+    }
+
+    private static ArrayList<GenericEntity> createEntities(Graph g) {
+        ArrayList<GenericEntity> entities = new ArrayList<>();
+
+        Chicken c1 = new Chicken("Chicken 1", "A slow chicken");
+        c1.setCurrentRoom(g.getNode("closet"));
+
+        return entities;
+    }
+
+    private static Graph createGraph() {
+        Graph g = new Graph();
+        g.addNode("hall");
+        g.getNode("hall").addItem("paper");
+        g.getNode("hall").addItem("pen");
+
+        g.addNode("closet");
+        g.getNode("closet").addItem("shoe");
+
+        g.addNode("dungeon");
+        g.getNode("dungeon").addItem("key");
+
+        g.addDirectedEdge("hall", "dungeon");
+        g.addUndirectedEdge("hall", "closet");
+
+        return g;
     }
 
     private static void drop(Graph.Room currentRoom, String[] arr, Player player) {
@@ -96,6 +123,4 @@ public class Main {
             } else System.out.println("You did not specify the direction!");
         }
     }
-
-
 }

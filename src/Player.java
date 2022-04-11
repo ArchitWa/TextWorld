@@ -20,10 +20,12 @@ public class Player {
     }
 
     public void displayInventory() {
-        System.out.println("You are carrying: ");
+        StringBuilder s = new StringBuilder("You are carrying: ");
         for (String key : items.keySet()) {
-            System.out.print(key + " ");
+            s.append(key).append(", ");
         }
+
+        System.out.println(items.size() == 0 ? "You don't have any items" : s.substring(0, s.length() - 2));
     }
 
     public Graph.Room getCurrentRoom() {
@@ -37,10 +39,8 @@ public class Player {
     public boolean moveToRoom(String name) {
         if (currentRoom.getNeighbor(name) != null) {
             setCurrentRoom(currentRoom.getNeighbor(name));
-            System.out.println("You moved to: " + name);
             return true;
         } else {
-            System.out.println("You cannot go there!");
             return false;
         }
     }
