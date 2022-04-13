@@ -1,7 +1,7 @@
 package Graph;
 
-import Entities.Chicken;
 import Entities.Entity;
+import Entities.GenericEntity;
 import Items.Item;
 
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Graph {
     private List<Room> nodes;
+    private HashMap<String, GenericEntity> entityList;
 
     public Graph() {
         nodes = new ArrayList<>();
@@ -37,17 +38,24 @@ public class Graph {
         return null;
     }
 
-    public static class Room {
+    public void moveAllEntities() {
+        for (String key : entityList.keySet()) {
+            entityList.get(key).move();
+        }
+    }
+
+    private HashMap<String, GenericEntity> getEntityList() {
+        return entityList;
+    }
+    public class Room {
         private String name;
         private boolean hasPlayerLoc;
         private HashMap<String, Room> neighbors;
         private HashMap<String, Item> items;
-        private HashMap<String, Entity> entities;
 
         private Room(String name) {
             neighbors = new HashMap<>();
             items = new HashMap<>();
-            entities = new HashMap<>();
             this.name = name;
         }
 
@@ -105,14 +113,12 @@ public class Graph {
 
         public String displayEntities() {
             StringBuilder s = new StringBuilder("This room has: ");
-            for (String key : entities.keySet()) {
-                s.append(key).append(", ");
-            }
-            return entities.size() == 0 ? "There are no entities in this room" : s.substring(0, s.length() - 2);
-        }
+            HashMap<String, GenericEntity> entityList = getEntityList();
 
-        public void addEntity(Entity entity) {
-            entities.put(entity.getName(), entity);
+            for (String key : entityList.keySet()) {
+                if (entityList.get(key).getCurrentRoom().getName().equals(this.name)) s.append(key).append(", ");
+            }
+            return entityList.size() == 0 ? "There are no entities in this room" : s.substring(0, s.length() - 2);
         }
 
         public void addItem(String name) {
@@ -163,8 +169,12 @@ public class Graph {
             return false;
         }
 
-        public void removeEntity(Entity entity) {
-            entities.remove(entity.getName());
+        public void addEntity(GenericEntity entity) {
+            getEntityList().put(entity.getName(), entity);
+        }
+
+        public void removeEntity(GenericEntity entity) {
+            getEntityList().remove(entity.getName());
         }
     }
 

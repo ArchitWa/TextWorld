@@ -3,11 +3,12 @@ import Graph.Graph;
 
 public abstract class GenericEntity implements Entity {
     private String name, description;
-    private Graph.Room currentRoom;
+    protected Graph.Room currentRoom;
 
-    public GenericEntity(String name, String description) {
+    public GenericEntity(String name, String description, Graph.Room currentRoom) {
         this.name = name;
         this.description = description;
+        this.currentRoom = currentRoom;
     }
 
     @Override

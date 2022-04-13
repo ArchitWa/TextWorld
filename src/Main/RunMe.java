@@ -1,11 +1,8 @@
 package Main;
 
 import Entities.*;
-import Entities.GenericEntity;
 import Graph.Graph;
 import Player.Player;
-
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class RunMe {
@@ -19,7 +16,7 @@ public class RunMe {
         player.setCurrentRoom(g.getNode("hall"));
         Graph.Room currentRoom;
 
-        ArrayList<GenericEntity> entityList = createEntities(g);
+        createEntities(g);
 
         String response = "";
         Scanner s = new Scanner(System.in);
@@ -58,34 +55,19 @@ public class RunMe {
             }
             System.out.println("--------------------------");
 
-            for (Entity e : entityList) e.move();
+            g.moveAllEntities();
+
+
         } while (!response.equals("quit"));
     }
 
-    private static ArrayList<GenericEntity> createEntities(Graph g) {
-        ArrayList<GenericEntity> entities = new ArrayList<>();
+    private static void createEntities(Graph g) {
+        Chicken c1 = new Chicken("Chicken 1", "A slow chicken", g.getNode("closet"));
+        Chicken c2 = new Chicken("Chicken 2", "A slower chicken", g.getNode("closet"));
 
-        Chicken c1 = new Chicken("Chicken 1", "A slow chicken");
-        c1.setCurrentRoom(g.getNode("closet"));
-        g.getNode("closet").addEntity(c1);
-        entities.add(c1);
+        Wumpus w1 = new Wumpus("Wumpus 1", "What even is this", g.getNode("dungeon"));
 
-        Chicken c2 = new Chicken("Chicken 2", "A slower chicken");
-        c2.setCurrentRoom(g.getNode("closet"));
-        g.getNode("closet").addEntity(c2);
-        entities.add(c2);
-
-        Wumpus w1 = new Wumpus("Wumpus 1", "What even is this");
-        w1.setCurrentRoom(g.getNode("dungeon"));
-        g.getNode("dungeon").addEntity(w1);
-        entities.add(w1);
-
-        PopStar p1 = new PopStar("Popstar 1", "Ok");
-        p1.setCurrentRoom(g.getNode("bathroom"));
-        g.getNode("bathroom").addEntity(p1);
-        entities.add(p1);
-
-        return entities;
+        PopStar p1 = new PopStar("Popstar 1", "Ok", g.getNode("bathroom"));
     }
 
     private static Graph createGraph() {
