@@ -2,8 +2,8 @@ package Entities;
 import Graph.Graph;
 
 public class Wumpus extends GenericEntity{
-    public Wumpus(String name, String description, Graph.Room currentRoom) {
-        super(name, description, currentRoom);
+    public Wumpus(Graph.Room currentRoom) {
+        super("wumpus", "a wumpus", currentRoom);
         currentRoom.addEntity(this);
     }
 

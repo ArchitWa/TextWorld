@@ -6,9 +6,18 @@ public abstract class GenericEntity implements Entity {
     protected Graph.Room currentRoom;
 
     public GenericEntity(String name, String description, Graph.Room currentRoom) {
-        this.name = name;
-        this.description = description;
         this.currentRoom = currentRoom;
+    }
+
+
+    public GenericEntity setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public GenericEntity setDescription(String description) {
+        this.description = description;
+        return this;
     }
 
     @Override

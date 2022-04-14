@@ -1,23 +1,26 @@
 package Graph;
 
-import Entities.GenericEntity;
+import Entities.*;
+import Entities.Wumpus;
 import Items.Item;
+import Player.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class Graph {
-    private List<Room> nodes;
+    private HashMap<String, Room> nodes;
     private HashMap<String, GenericEntity> entityList;
+    private Player player;
 
-    public Graph() {
-        nodes = new ArrayList<>();
+    public Graph(Player player) {
+        nodes = new HashMap<>();
         entityList = new HashMap<>();
+        this.player = player;
     }
 
     public void addNode(String name) {
-        nodes.add(new Room(name));
+        nodes.put(name, new Room(name));
     }
 
     public void addDirectedEdge(String name1, String name2) {
@@ -34,8 +37,7 @@ public class Graph {
     }
 
     public Room getNode(String name) {
-        for (Room n : nodes) if (n.getName().equals(name)) return n;
-        return null;
+        return nodes.get(name);
     }
 
     public void moveAllEntities() {
@@ -48,6 +50,32 @@ public class Graph {
     private HashMap<String, GenericEntity> getEntityList() {
         return entityList;
     }
+
+    public void createItem(String itemName, String roomName) {
+        Room room = nodes.get(roomName);
+        room.addItem(itemName);
+    }
+
+    public void createRandomChickens(int n) {
+        for (int i = 0; i < n; i++) {
+            Object[] roomNames = nodes.keySet().toArray();
+            @SuppressWarnings("SuspiciousMethodCalls")
+            Chicken c = (Chicken) (new Chicken(nodes.get((String) roomNames[(int) (Math.random() * nodes.size())]))).setName("Chicken " + i);
+        }
+    }
+
+    public void createWumpus(String roomName) {
+        Wumpus w = (Wumpus) new Wumpus(nodes.get(roomName)).setName("Wumpus " + (int)( Math.random() * 100));
+    }
+
+    public void createPopStar(String bathroom) {
+        PopStar p = (PopStar) new PopStar(nodes.get("bathroom")).setName("Popstar " + (int)(Math.random() * 100));
+    }
+
+    public Room getPlayerRoom() {
+        return player.getCurrentRoom();
+    }
+
     public class Room {
         private String name;
         private boolean hasPlayer;
@@ -66,7 +94,7 @@ public class Graph {
         }
 
 
-        public void setHasPlayerLoc() {
+        public void setHasPlayer() {
             hasPlayer = !hasPlayer;
         }
 
@@ -111,9 +139,10 @@ public class Graph {
             HashMap<String, GenericEntity> entityList = getEntityList();
 
             for (String key : entityList.keySet()) {
-                if (entityList.get(key).getCurrentRoom().getName().equals(this.name)) s.append(key).append(", ");
+                if (entityList.get(key).getCurrentRoom().getName().equals(this.name))
+                    s.append(entityList.get(key).getName()).append(", ");
             }
-            return s.toString().equals("This room has: ")  ? "There are no entities in this room" : s.substring(0, s.length() - 2);
+            return s.toString().equals("This room has: ") ? "There are no entities in this room" : s.substring(0, s.length() - 2);
         }
 
         public void addItem(String name) {
@@ -147,6 +176,7 @@ public class Graph {
         }
 
         public Room getPlayerRoom() {
+            if (hasPlayer) return this;
             for (String key : neighbors.keySet()) {
                 if (neighbors.get(key).getHasPlayer()) {
                     return neighbors.get(key);
@@ -170,7 +200,7 @@ public class Graph {
         }
 
         public Graph.Room getRandomRoomWithoutPlayer() {
-            ArrayList<Room> temp  = new ArrayList<>();
+            ArrayList<Room> temp = new ArrayList<>();
             for (String key : neighbors.keySet()) if (!neighbors.get(key).hasPlayer) temp.add(neighbors.get(key));
             return temp.get((int) (Math.random() * temp.size()));
         }

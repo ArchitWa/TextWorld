@@ -1,95 +1,105 @@
 package Main;
 
+import Commands.*;
 import Entities.*;
 import Graph.Graph;
 import Player.Player;
+
 import java.util.Scanner;
 
 public class RunMe {
     public static void main(String[] args) {
 
-        /* Creating the graph */
-        Graph g = createGraph();
-
-        /* Creating the player and adding him to the graph */
+        /* Creating the graph and player */
         Player player = new Player("Bob", "An adventurous fellow");
-        player.setCurrentRoom(g.getNode("hall"));
+        Graph graph = new Graph(player);
+        player.setCurrentRoom(graph.getNode("hall"));
         Graph.Room currentRoom;
 
-        createEntities(g);
+
+        CommandParser parser = new CommandParser();
+
+        initRooms(graph);
+        initItems(graph);
+        initEntities(graph);
+        
+        initCommands(parser, player, graph);
 
         String response = "";
         Scanner s = new Scanner(System.in);
 
         /* Display all the commands they can type, so they know what to do */
-        System.out.println("You can use the following commands: \ngo [room name]\nlook\nadd room [directed/undirected] [room name]\nquit\ntake [item]\ndrop [item]\nrooms");
+        parser.displayCommands();
         System.out.println("--------------------------");
+
         do {
             currentRoom = player.getCurrentRoom();
-            currentRoom.setHasPlayerLoc();
+            currentRoom.setHasPlayer();
             System.out.println("You are currently in the " + currentRoom.getName());
             System.out.print("What do you want to do? > ");
 
-            response = s.nextLine();
-            String[] arr = response.split(" ");
+            response = s.nextLine().trim();
+
+            Command nextCmd = parser.parseCommandString(response);
+            System.out.println("--------------------------");
+            if (nextCmd != null) nextCmd.execute();
+            else parser.displayCommands();
+
+//            String[] arr = response.split(" ");
+//            if (arr[0].equals("go")) {
+//                go(player, arr);
+//                currentRoom.setHasPlayer();
+//            } else if (arr[0].equals("look")) {
+//                System.out.println(currentRoom.displayItems());
+//                System.out.println(currentRoom.displayEntities());
+//            } else if (arr[0].equals("rooms")) {
+//                rooms(currentRoom);
+//            } else if (response.startsWith("add room")) {
+//                addRoom(arr, graph, player.getCurrentRoom());
+//            } else if (arr[0].equals("take")) {
+//                take(currentRoom, arr, player);
+//            } else if (arr[0].equals("drop")) {
+//                drop(currentRoom, arr, player);
+//            } else if (arr[0].equals("quit")) {
+//                System.out.println("You have ended the game.");
+//            } else {
+//                System.out.println("You can use the following commands: \ngo [room name]\nlook\nadd room [directed/undirected] [room name]\nquit\ntake [item]\ndrop [item]\nrooms");
+//            }
             System.out.println("--------------------------");
 
-            if (arr[0].equals("go")) {
-                go(player, arr);
-                currentRoom.setHasPlayerLoc();
-            } else if (arr[0].equals("look")) {
-                System.out.println(currentRoom.displayItems());
-                System.out.println(currentRoom.displayEntities());
-            } else if (arr[0].equals("rooms")) {
-                rooms(currentRoom);
-            }else if (response.startsWith("add room")) {
-                addRoom(arr, g, player.getCurrentRoom());
-            } else if (arr[0].equals("take")) {
-                take(currentRoom, arr, player);
-            } else if (arr[0].equals("drop")) {
-                drop(currentRoom, arr, player);
-            } else if (arr[0].equals("quit")) {
-                System.out.println("You have ended the game.");
-            } else {
-                System.out.println("You can use the following commands: \ngo [room name]\nlook\nadd room [directed/undirected] [room name]\nquit\ntake [item]\ndrop [item]\nrooms");
-            }
-            System.out.println("--------------------------");
-
-            g.moveAllEntities();
+            graph.moveAllEntities();
 
 
         } while (!response.equals("quit"));
     }
 
-    private static void createEntities(Graph g) {
-        Chicken c1 = new Chicken("Chicken 1", "A slow chicken", g.getNode("closet"));
-        Chicken c2 = new Chicken("Chicken 2", "A slower chicken", g.getNode("closet"));
-
-        Wumpus w1 = new Wumpus("Wumpus 1", "What even is this", g.getNode("dungeon"));
-
-        PopStar p1 = new PopStar("Popstar 1", "Ok", g.getNode("bathroom"));
+    private static void initCommands(CommandParser parser, Player player, Graph graph) {
+        parser.addCommand(new GoCommand(player));
+        parser.addCommand(new LookCommand(graph));
     }
 
-    private static Graph createGraph() {
-        Graph g = new Graph();
+    private static void initItems(Graph g) {
+        g.createItem("paper", "hall");
+        g.createItem("pen", "hall");
+        g.createItem("key", "dungeon");
+        g.createItem("toothbrush", "bathroom");
+    }
+
+    private static void initEntities(Graph g) {
+        g.createRandomChickens(10);
+        g.createWumpus("dungeon");
+        g.createPopStar("bathroom");
+    }
+
+    private static void initRooms(Graph g) {
         g.addNode("hall");
-        g.getNode("hall").addItem("paper");
-        g.getNode("hall").addItem("pen");
-
         g.addNode("closet");
-        g.getNode("closet").addItem("shoe");
-
         g.addNode("dungeon");
-        g.getNode("dungeon").addItem("key");
-
         g.addNode("bathroom");
-        g.getNode("bathroom").addItem("toothbrush");
 
         g.addDirectedEdge("hall", "dungeon");
         g.addUndirectedEdge("hall", "closet");
         g.addUndirectedEdge("closet", "bathroom");
-
-        return g;
     }
 
     private static void go(Player player, String[] arr) {

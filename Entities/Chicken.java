@@ -2,8 +2,8 @@ package Entities;
 import Graph.Graph;
 
 public class Chicken extends GenericEntity {
-    public Chicken(String name, String description, Graph.Room currentRoom) {
-        super(name, description, currentRoom);
+    public Chicken(Graph.Room currentRoom) {
+        super("chicken", "a chicken", currentRoom);
         this.currentRoom.addEntity(this);
     }
 

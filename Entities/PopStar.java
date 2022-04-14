@@ -3,8 +3,8 @@ package Entities;
 import Graph.Graph;
 
 public class PopStar extends GenericEntity {
-    public PopStar(String name, String description, Graph.Room currentRoom) {
-        super(name, description, currentRoom);
+    public PopStar(Graph.Room currentRoom) {
+        super("popstar", "a popstar", currentRoom);
         this.currentRoom.addEntity(this);
     }
 
