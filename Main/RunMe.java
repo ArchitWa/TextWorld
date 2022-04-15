@@ -13,16 +13,15 @@ public class RunMe {
         /* Creating the graph and player */
         Player player = new Player("Bob", "An adventurous fellow");
         Graph graph = new Graph(player);
-        player.setCurrentRoom(graph.getNode("hall"));
-        Graph.Room currentRoom;
-
-
         CommandParser parser = new CommandParser();
 
         initRooms(graph);
         initItems(graph);
         initEntities(graph);
-        
+
+        player.setCurrentRoom(graph.getNode("hall"));
+        Graph.Room currentRoom;
+
         initCommands(parser, player, graph);
 
         String response = "";
@@ -45,19 +44,6 @@ public class RunMe {
             if (nextCmd != null) nextCmd.execute();
             else parser.displayCommands();
 
-//            String[] arr = response.split(" ");
-//            if (arr[0].equals("go")) {
-//                go(player, arr);
-//                currentRoom.setHasPlayer();
-//            } else if (arr[0].equals("look")) {
-//                System.out.println(currentRoom.displayItems());
-//                System.out.println(currentRoom.displayEntities());
-//            } else if (arr[0].equals("rooms")) {
-//                rooms(currentRoom);
-//            } else if (response.startsWith("add room")) {
-//                addRoom(arr, graph, player.getCurrentRoom());
-//            } else if (arr[0].equals("take")) {
-//                take(currentRoom, arr, player);
 //            } else if (arr[0].equals("drop")) {
 //                drop(currentRoom, arr, player);
 //            } else if (arr[0].equals("quit")) {
@@ -76,6 +62,9 @@ public class RunMe {
     private static void initCommands(CommandParser parser, Player player, Graph graph) {
         parser.addCommand(new GoCommand(player));
         parser.addCommand(new LookCommand(graph));
+        parser.addCommand(new RoomsCommand(player));
+        parser.addCommand(new AddRoomCommand(graph));
+        parser.addCommand(new TakeCommand(player));
     }
 
     private static void initItems(Graph g) {
@@ -110,25 +99,6 @@ public class RunMe {
         }
     }
 
-    private static void drop(Graph.Room currentRoom, String[] arr, Player player) {
-        if (player.hasItem(arr[1])) {
-            currentRoom.addItem(player.getItem(arr[1]));
-            player.removeItem(arr[1]);
-        } else {
-            System.out.println("You do not have this item!");
-        }
-    }
-
-    private static void take(Graph.Room currentRoom, String[] arr, Player player) {
-        if (currentRoom.hasItem(arr[1])) {
-            player.addItem(currentRoom.getItem(arr[1]));
-            currentRoom.removeItem(arr[1]);
-            System.out.println("You have grabbed the " + arr[1] + " item");
-        } else {
-            System.out.println("This room does not have this item!");
-        }
-    }
-
     private static void rooms(Graph.Room currentRoom) {
         System.out.println(
                 currentRoom.getNeighborNames().equals("") ?
@@ -147,6 +117,25 @@ public class RunMe {
                 System.out.println("A new undirected room was added: " + arr[3]);
                 g.addUndirectedEdge(current.getName(), arr[3]);
             } else System.out.println("You did not specify the direction!");
+        }
+    }
+
+    private static void take(Graph.Room currentRoom, String[] arr, Player player) {
+        if (currentRoom.hasItem(arr[1])) {
+            player.addItem(currentRoom.getItem(arr[1]));
+            currentRoom.removeItem(arr[1]);
+            System.out.println("You have grabbed the " + arr[1] + " item");
+        } else {
+            System.out.println("This room does not have this item!");
+        }
+    }
+
+    private static void drop(Graph.Room currentRoom, String[] arr, Player player) {
+        if (player.hasItem(arr[1])) {
+            currentRoom.addItem(player.getItem(arr[1]));
+            player.removeItem(arr[1]);
+        } else {
+            System.out.println("You do not have this item!");
         }
     }
 }

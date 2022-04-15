@@ -23,6 +23,6 @@ public class CommandParser {
     }
 
     public void displayCommands() {
-        System.out.println("You can use the following commands: \ngo [room name]\nlook\nadd room [directed/undirected] [room name]\nquit\ntake [item]\ndrop [item]\nrooms");
+        System.out.println("You can use the following commands: \ngo [room name]\nlook\nadd-room [directed/undirected] [room name]\nquit\ntake [item]\ndrop [item]\nrooms");
     }
 }
