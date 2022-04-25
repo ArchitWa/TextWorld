@@ -1,7 +1,6 @@
 package Main;
 
 import Commands.*;
-import Entities.*;
 import Graph.Graph;
 import Player.Player;
 
@@ -40,22 +39,13 @@ public class RunMe {
             response = s.nextLine().trim();
 
             Command nextCmd = parser.parseCommandString(response);
+
             System.out.println("--------------------------");
             if (nextCmd != null) nextCmd.execute();
             else parser.displayCommands();
-
-//            } else if (arr[0].equals("drop")) {
-//                drop(currentRoom, arr, player);
-//            } else if (arr[0].equals("quit")) {
-//                System.out.println("You have ended the game.");
-//            } else {
-//                System.out.println("You can use the following commands: \ngo [room name]\nlook\nadd room [directed/undirected] [room name]\nquit\ntake [item]\ndrop [item]\nrooms");
-//            }
             System.out.println("--------------------------");
 
             graph.moveAllEntities();
-
-
         } while (!response.equals("quit"));
     }
 
@@ -65,6 +55,7 @@ public class RunMe {
         parser.addCommand(new RoomsCommand(player));
         parser.addCommand(new AddRoomCommand(graph));
         parser.addCommand(new TakeCommand(player));
+        parser.addCommand(new DropCommand(player));
     }
 
     private static void initItems(Graph g) {
@@ -89,53 +80,5 @@ public class RunMe {
         g.addDirectedEdge("hall", "dungeon");
         g.addUndirectedEdge("hall", "closet");
         g.addUndirectedEdge("closet", "bathroom");
-    }
-
-    private static void go(Player player, String[] arr) {
-        if (player.moveToRoom(arr[1])) {
-            System.out.println("You moved to: " + arr[1]);
-        } else {
-            System.out.println("You cannot go there!");
-        }
-    }
-
-    private static void rooms(Graph.Room currentRoom) {
-        System.out.println(
-                currentRoom.getNeighborNames().equals("") ?
-                        "You cannot go anywhere" : "You can go to the: " + currentRoom.getNeighborNames());
-    }
-
-    private static void addRoom(String[] arr, Graph g, Graph.Room current) {
-        if (arr.length < 4)
-            System.out.println("You must specify what you would like the room to be called and its direction");
-        else {
-            g.addNode(arr[3]);
-            if (arr[2].equals("directed")) {
-                System.out.println("A new directed room was added: " + arr[3]);
-                g.addDirectedEdge(current.getName(), arr[3]);
-            } else if (arr[2].equals("undirected")) {
-                System.out.println("A new undirected room was added: " + arr[3]);
-                g.addUndirectedEdge(current.getName(), arr[3]);
-            } else System.out.println("You did not specify the direction!");
-        }
-    }
-
-    private static void take(Graph.Room currentRoom, String[] arr, Player player) {
-        if (currentRoom.hasItem(arr[1])) {
-            player.addItem(currentRoom.getItem(arr[1]));
-            currentRoom.removeItem(arr[1]);
-            System.out.println("You have grabbed the " + arr[1] + " item");
-        } else {
-            System.out.println("This room does not have this item!");
-        }
-    }
-
-    private static void drop(Graph.Room currentRoom, String[] arr, Player player) {
-        if (player.hasItem(arr[1])) {
-            currentRoom.addItem(player.getItem(arr[1]));
-            player.removeItem(arr[1]);
-        } else {
-            System.out.println("You do not have this item!");
-        }
     }
 }
